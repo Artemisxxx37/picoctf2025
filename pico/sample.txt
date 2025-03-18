@@ -1,0 +1,42 @@
+rule Suspicious_Executable_UPX
+{
+    meta:
+        description = "Detects suspicious UPX-packed executable"
+        author = "Your Name"
+        version = "1.1"
+        date = "2025-03-08"
+
+    strings:
+        $mz = { 4D 5A }  // MZ header
+        $upx1 = "UPX0" ascii
+        $upx2 = "UPX1" ascii
+        $upx3 = "UPX!" ascii
+        $unique_str1 = "Welcome to the YaraRules0x100 challenge!" ascii wide
+        $unique_str2 = "<?xml version='1.0' encoding='UTF-8'" ascii wide
+        $api1 = "VirtualProtect" ascii wide
+        $api2 = "GetProcAddress" ascii wide
+
+    condition:
+        $mz and 2 of ($upx*) and 1 of ($unique_str*) and 1 of ($api*)
+}
+
+rule Suspicious_Executable_Unpacked
+{
+    meta:
+        description = "Detects suspicious unpacked executable"
+        author = "Your Name"
+        version = "1.1"
+        date = "2025-03-08"
+
+    strings:
+        $mz = { 4D 5A }  // MZ header
+        $unique_str1 = "Welcome to the YaraRules0x100 challenge!" ascii wide
+        $unique_str2 = "<?xml version='1.0' encoding='UTF-8'" ascii wide
+        $api1 = "VirtualProtect" ascii wide
+        $api2 = "GetProcAddress" ascii wide
+        $api3 = "LoadLibraryA" ascii wide
+        $api4 = "OpenProcessToken" ascii wide
+
+    condition:
+        $mz and 1 of ($unique_str*) and 2 of ($api*)
+}
